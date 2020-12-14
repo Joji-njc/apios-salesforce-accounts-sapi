@@ -1,27 +1,42 @@
 #%RAML 1.0
+baseUri: https://anypoint.mulesoft.com/mocking/api/v1/links/03ae2bc1-c257-4760-bbbf-9d067a37e7e2/ # 
 
 version: v1.0
 title: Salesforce Account API
 
-traits:
-  jwt:
-    headers:
-      authorization:
-        description: Bearer 
-        type: string
-    responses:
-      400:
-        description: Token was not provided.
-      401:
-        description: Bad or expired token. To fix, you should re-authenticate the user.
-      403:
-        description: The client id validation failed.
-      503:
-        description: Error communicating with JWKS server.
+securitySchemes:
+  oauth_2_0:
+    description: |
+      This API supports OAuth 2.0 for authenticating all API requests.
+    type: OAuth 2.0
+    describedBy:
+      queryParameters:
+        access_token:
+          description: |
+             Used to send a valid OAuth 2 access token.
+          type: string
+      responses:
+        400:
+          description: Invalid token.
+        401:
+          description: |
+            Unauthorized or Connection error when connecting to the authorization server.
+        403:
+          description: |
+            Forbidden, invalid client application credentials.
+        500:
+          description: |
+            Bad response from authorization server, or WSDL SOAP Fault error.
+    settings:
+      authorizationUri: https://dev-536244.okta.com/oauth2/default/v1/authorize
+      accessTokenUri: https://dev-536244.okta.com/oauth2/default/v1/token
+      authorizationGrants: [client_credentials]
+      
+        
 
 /accounts:
   get:
-    is: [jwt]
+    securedBy: [oauth_2_0]
     responses:
       200:
         body:
